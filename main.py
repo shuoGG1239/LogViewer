@@ -1,18 +1,33 @@
 import sys
-from PyQt5.QtWidgets import QApplication
+import os
+
 from PyQt5.QtGui import QIcon
-import KeyActionWidget
-from qss_ui_theme import qss_setting
+from PyQt5.QtWidgets import QApplication
 from qss_ui_theme import green_theme
+from qss_ui_theme import qss_setting
 from qss_ui_theme import window_titlebar
+
+import LogViewer
+
+
+def scan_icon(ico_name):
+    """
+    扫描ico并返回Qicon
+    :param ico_name:
+    :return: Qicon
+    """
+    if os.path.isfile(window_titlebar.imageroot + ico_name):
+        return QIcon(window_titlebar.imageroot + ico_name)
+    else:
+        return QIcon(ico_name)
 
 
 def run_with_titlebar():
     app = QApplication(sys.argv)
-    keywidget = KeyActionWidget.KeyActionWidget()
+    keywidget = LogViewer.LogViewer()
     mainWindow = window_titlebar.WindowWithTitleBar(keywidget, qss_setting.DARKBLUEGREEN, 0)
-    mainWindow.setWindowTitle('Key action')
-    mainWindow.setWindowIcon(QIcon(window_titlebar.imageroot + 'myicon.ico'))
+    mainWindow.setWindowTitle('Log Viewer')
+    mainWindow.setWindowIcon(scan_icon('myicon.ico'))
     green_theme.setAppGreenStyle()
     mainWindow.show()
     sys.exit(app.exec_())
@@ -20,14 +35,22 @@ def run_with_titlebar():
 
 def run_only_greentheme():
     app = QApplication(sys.argv)
-    mainWindow = KeyActionWidget.KeyActionWidget()
-    mainWindow.setWindowIcon(QIcon(window_titlebar.imageroot + 'myicon.ico'))
+    mainWindow = LogViewer.LogViewer()
+    mainWindow.setWindowTitle('Log Viewer')
+    mainWindow.setWindowIcon(scan_icon('myicon.ico'))
     green_theme.setAppGreenStyle()
     mainWindow.show()
     sys.exit(app.exec_())
 
 
+def run():
+    app = QApplication(sys.argv)
+    mainWindow = LogViewer.LogViewer()
+    mainWindow.setWindowTitle('Log Viewer')
+    mainWindow.setWindowIcon(scan_icon('myicon.ico'))
+    mainWindow.show()
+    sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
-    run_with_titlebar()
-
-
+    run_only_greentheme()
