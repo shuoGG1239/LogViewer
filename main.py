@@ -53,4 +53,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run_only_greentheme()
+    run_with_titlebar()
