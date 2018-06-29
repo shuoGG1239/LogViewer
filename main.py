@@ -8,7 +8,7 @@ from LogViewer import LogViewer
 
 def run_with_titlebar():
     app = QApplication(sys.argv)
-    w = CandyWindow.createWindow(LogViewer(), 'Log Viewer', 'myicon.ico')
+    w = CandyWindow.createWindow(LogViewer(), 'Log Viewer', 'myicon.ico', CandyWindow.THEME_BLUE_GREEN)
     w.show()
     sys.exit(app.exec_())
 
