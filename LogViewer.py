@@ -1,16 +1,18 @@
 import os
+import re
 import sys
 import threading
-import re
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 from PyQt5.QtWidgets import QWidget
+from QCandyUi.CandyWindow import colorful
 
 import color_util
 import sshLogger
 from ui_LogViewer import Ui_LogViewer
 
 
+@colorful('blue')
 class LogViewer(QWidget):
     signal_response = pyqtSignal(str)
 
