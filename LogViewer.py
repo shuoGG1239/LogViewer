@@ -12,7 +12,7 @@ import sshLogger
 from ui_LogViewer import Ui_LogViewer
 
 
-@colorful('blue')
+@colorful('blueGreen')
 class LogViewer(QWidget):
     signal_response = pyqtSignal(str)
 
@@ -44,6 +44,11 @@ class LogViewer(QWidget):
             self.ui.textBrowser.append(self.colorize(useful_text))
 
     def colorize(self, text):
+        """
+        对单行进行着色
+        :param text:
+        :return:
+        """
         text = re.sub(r'\s:\s(.+)', color_util.colorize(' : \\1', 'blue'), text)
         text = text.replace('INFO', color_util.colorize('INFO', color_util.LIGHT_BLUE))
         text = text.replace('ERROR', color_util.colorize('ERROR', 'red'))

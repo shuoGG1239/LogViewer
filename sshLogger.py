@@ -1,23 +1,39 @@
 import traceback
 import paramiko
+import json
 from paramiko_expect import SSHClientInteraction
 
 
+class User:
+    def __init__(self, host, name, password, log_url):
+        self.host = host
+        self.name = name
+        self.password = password
+        self.log_url = log_url
+
+
+def load_user_info():
+    with open('userinfo.json') as f:
+        info = json.load(f)
+        return User(info.get('host'), info.get('name'), info.get('password'), info.get('log_url'))
+
+
 def run_conn_log():
-    hostname = '39.108.226.252'
-    username = 'root'
-    password = 'qwert123/'
+    user = load_user_info()
+    host = user.host
+    name = user.name
+    password = user.password
     prompt = '.+'
 
     try:
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname=hostname, username=username, password=password)
+        client.connect(hostname=host, username=name, password=password)
         interact = SSHClientInteraction(client, timeout=10, display=False)
         interact.expect(prompt)
-        interact.send('tail -f /home/admin.log')
-        interact.tail(line_prefix=hostname + ': ', timeout=65535)
+        interact.send('tail -f ' + user.log_url)
+        interact.tail(line_prefix=host + ': ', timeout=65535)
 
     except KeyboardInterrupt:
         print('Ctrl+C interruption detected, stopping tail')
