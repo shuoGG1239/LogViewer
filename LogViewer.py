@@ -21,7 +21,7 @@ class LogViewer(QWidget):
         self.ui = Ui_LogViewer()
         self.ui.setupUi(self)
         self.__redirect_print()
-        # self.run_log_async()
+        self.run_log_async()
 
     def run_log_async(self):
         t = threading.Thread(target=sshLogger.run_conn_log)

@@ -1,6 +1,6 @@
 {
-  "password": "qwert123/",
-  "host": "39.108.226.252",
-  "user": "root",
-  "logUrl": "/home/admin.log"
+  "password": "2222222",
+  "host": "39.108.226.222",
+  "name": "root",
+  "logUrl": "/home/server/admin.log"
 }

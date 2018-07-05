@@ -15,7 +15,7 @@ class User:
 def load_user_info():
     with open('userinfo.json') as f:
         info = json.load(f)
-        return User(info.get('host'), info.get('name'), info.get('password'), info.get('log_url'))
+        return User(info.get('host'), info.get('name'), info.get('password'), info.get('logUrl'))
 
 
 def run_conn_log():
@@ -32,7 +32,7 @@ def run_conn_log():
         client.connect(hostname=host, username=name, password=password)
         interact = SSHClientInteraction(client, timeout=10, display=False)
         interact.expect(prompt)
-        interact.send('tail -f ' + user.log_url)
+        interact.send('tail -f -n 1000 ' + user.log_url)
         interact.tail(line_prefix=host + ': ', timeout=65535)
 
     except KeyboardInterrupt:
