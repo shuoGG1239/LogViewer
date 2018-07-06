@@ -2,6 +2,7 @@ RED = 'red'
 BLUE = 'blue'
 GREEN = 'green'
 LIGHT_BLUE = '#64b2ed'
+ORANGE = 'orange'
 
 
 def bold(text):

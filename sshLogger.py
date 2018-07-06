@@ -5,17 +5,17 @@ from paramiko_expect import SSHClientInteraction
 
 
 class User:
-    def __init__(self, host, name, password, log_url):
+    def __init__(self, host, name, password, cmd):
         self.host = host
         self.name = name
         self.password = password
-        self.log_url = log_url
+        self.cmd = cmd
 
 
 def load_user_info():
     with open('userinfo.json') as f:
         info = json.load(f)
-        return User(info.get('host'), info.get('name'), info.get('password'), info.get('logUrl'))
+        return User(info.get('host'), info.get('name'), info.get('password'), info.get('cmd'))
 
 
 def run_conn_log():
@@ -23,6 +23,8 @@ def run_conn_log():
     host = user.host
     name = user.name
     password = user.password
+    host = '39.108.226.252'
+    password = '123qwertGg/'
     prompt = '.+'
 
     try:
@@ -32,7 +34,7 @@ def run_conn_log():
         client.connect(hostname=host, username=name, password=password)
         interact = SSHClientInteraction(client, timeout=10, display=False)
         interact.expect(prompt)
-        interact.send('tail -f -n 1000 ' + user.log_url)
+        interact.send(user.cmd)
         interact.tail(line_prefix=host + ': ', timeout=65535)
 
     except KeyboardInterrupt:
