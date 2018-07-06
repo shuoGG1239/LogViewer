@@ -23,8 +23,6 @@ def run_conn_log():
     host = user.host
     name = user.name
     password = user.password
-    host = '39.108.226.252'
-    password = '123qwertGg/'
     prompt = '.+'
 
     try:

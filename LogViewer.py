@@ -4,7 +4,8 @@ import sys
 import threading
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import QWidget, QMenu, QAction
 from QCandyUi.CandyWindow import colorful
 
 import color_util
@@ -23,8 +24,8 @@ class LogViewer(QWidget):
         self.ui = Ui_LogViewer()
         self.ui.setupUi(self)
         self.__redirect_print()
+        self.__init_menu()
         self.run_log_async()
-        self.ui.textBrowser.setFocus()
 
     def run_log_async(self):
         """
@@ -61,6 +62,7 @@ class LogViewer(QWidget):
         text = text.replace('INFO', color_util.colorize('INFO', color_util.LIGHT_BLUE))
         text = text.replace('ERROR', color_util.colorize('ERROR', 'red'))
         text = text.replace('WARN', color_util.colorize('WARN', 'orange'))
+        text = re.sub(r'(\w+Exception)', color_util.colorize('\\1', 'red'), text)
         text = re.sub(r'(\([\w_]+\.java:\d+\))', color_util.colorize(color_util.underline('\\1'), 'red'), text)
         return text
 
@@ -71,6 +73,32 @@ class LogViewer(QWidget):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
             self.ui.textBrowser.clear()
+
+    def __init_menu(self):
+        # 先将TextBrowser的右键菜单剔除, 不然其优先级会高于browserMenu
+        self.ui.textBrowser.setContextMenuPolicy(Qt.NoContextMenu)
+        self.browserMenu = QMenu()
+        self.actionClear = QAction('Clear (esc)', self.browserMenu)
+        self.actionCopy = QAction('Copy (ctrl+c)', self.browserMenu)
+        self.actionSelectAll = QAction('Select All (ctrl+a)', self.browserMenu)
+        self.browserMenu.addAction(self.actionClear)
+        self.browserMenu.addAction(self.actionCopy)
+        self.browserMenu.addAction(self.actionSelectAll)
+        self.actionClear.triggered.connect(self.__slot_clear)
+        self.actionCopy.triggered.connect(self.__slot_copy)
+        self.actionSelectAll.triggered.connect(self.__slot_select_all)
+
+    def __slot_clear(self):
+        self.ui.textBrowser.clear()
+
+    def __slot_copy(self):
+        self.ui.textBrowser.copy()
+
+    def __slot_select_all(self):
+        self.ui.textBrowser.selectAll()
+
+    def contextMenuEvent(self, event):
+        self.browserMenu.exec(QCursor.pos())
 
 
 # 用于重定向sys.out的类, 只要带write flush方法即可(非重写,是duckType)
