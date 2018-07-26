@@ -4,13 +4,14 @@ import sys
 import threading
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QTextDocument
 from PyQt5.QtWidgets import QWidget, QMenu, QAction
 from QCandyUi.CandyWindow import colorful
 
 import color_util
 import sshLogger
 from ui_LogViewer import Ui_LogViewer
+from SearchForm import SearchForm
 
 DEBUG = False
 
@@ -23,9 +24,27 @@ class LogViewer(QWidget):
         QWidget.__init__(self)
         self.ui = Ui_LogViewer()
         self.ui.setupUi(self)
+        self.__init_searchForm()
         self.__redirect_print()
         self.__init_menu()
         self.run_log_async()
+
+    def __init_searchForm(self):
+        self.searchForm = SearchForm()
+        self.searchForm.setParent(self)
+        self.searchForm.hide()
+        self.searchForm.ui.pushButtonForward.clicked.connect(self.__slot_find_forward)
+        self.searchForm.ui.pushButtonBackward.clicked.connect(self.__slot_find_backward)
+        self.searchForm.ui.pushButtonClose.clicked.connect(self.__slot_searchForm_close)
+
+    def __slot_searchForm_close(self):
+        self.ui.textBrowser.setFocus()
+
+    def __slot_find_forward(self):
+        self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text())
+
+    def __slot_find_backward(self):
+        self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text(), QTextDocument.FindBackward)
 
     def run_log_async(self):
         """
@@ -73,6 +92,14 @@ class LogViewer(QWidget):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
             self.ui.textBrowser.clear()
+        if (e.modifiers() == Qt.ControlModifier) and (e.key() == Qt.Key_F):
+            if self.searchForm.isHidden():
+                self.searchForm.setGeometry(self.width() - self.searchForm.width(), 0, self.searchForm.width(),
+                                            self.searchForm.height())
+                self.searchForm.show()
+            else:
+                self.searchForm.hide()
+                self.ui.textBrowser.setFocus()
 
     def __init_menu(self):
         # 先将TextBrowser的右键菜单剔除, 不然其优先级会高于browserMenu
