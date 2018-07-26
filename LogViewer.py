@@ -10,8 +10,8 @@ from QCandyUi.CandyWindow import colorful
 
 import color_util
 import sshLogger
-from ui_LogViewer import Ui_LogViewer
 from SearchForm import SearchForm
+from ui_LogViewer import Ui_LogViewer
 
 DEBUG = False
 
@@ -36,13 +36,24 @@ class LogViewer(QWidget):
         self.searchForm.ui.pushButtonForward.clicked.connect(self.__slot_find_forward)
         self.searchForm.ui.pushButtonBackward.clicked.connect(self.__slot_find_backward)
         self.searchForm.ui.pushButtonClose.clicked.connect(self.__slot_searchForm_close)
+        self.searchForm.signal_key.connect(self.__slot_searchForm_keyboard)
 
+    @pyqtSlot(int)
+    def __slot_searchForm_keyboard(self, key):
+        if key == Qt.Key_Return:
+            self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text())
+        elif key == (Qt.Key_Return + Qt.ShiftModifier):
+            self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text(), QTextDocument.FindBackward)
+
+    @pyqtSlot()
     def __slot_searchForm_close(self):
         self.ui.textBrowser.setFocus()
 
+    @pyqtSlot()
     def __slot_find_forward(self):
         self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text())
 
+    @pyqtSlot()
     def __slot_find_backward(self):
         self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text(), QTextDocument.FindBackward)
 
@@ -97,6 +108,7 @@ class LogViewer(QWidget):
                 self.searchForm.setGeometry(self.width() - self.searchForm.width(), 0, self.searchForm.width(),
                                             self.searchForm.height())
                 self.searchForm.show()
+                self.searchForm.ui.lineEdit.setFocus()
             else:
                 self.searchForm.hide()
                 self.ui.textBrowser.setFocus()
