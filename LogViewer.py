@@ -105,8 +105,6 @@ class LogViewer(QWidget):
             self.ui.textBrowser.clear()
         if (e.modifiers() == Qt.ControlModifier) and (e.key() == Qt.Key_F):
             if self.searchForm.isHidden():
-                self.searchForm.setGeometry(self.width() - self.searchForm.width(), 0, self.searchForm.width(),
-                                            self.searchForm.height())
                 self.searchForm.show()
                 self.searchForm.ui.lineEdit.setFocus()
             else:
@@ -138,6 +136,10 @@ class LogViewer(QWidget):
 
     def contextMenuEvent(self, event):
         self.browserMenu.exec(QCursor.pos())
+
+    def resizeEvent(self, e):
+        self.searchForm.setGeometry(e.size().width() - self.searchForm.width(), 0,
+         self.searchForm.width(), self.searchForm.height())
 
 
 # 用于重定向sys.out的类, 只要带write flush方法即可(非重写,是duckType)
