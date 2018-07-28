@@ -11,3 +11,7 @@
 <br>
 
 * 指令可以灵活配置
+
+## 依赖
+* pip install paramiko-expect
+* pip install QCandyUi

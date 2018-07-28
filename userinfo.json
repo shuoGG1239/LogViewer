@@ -1,5 +1,5 @@
 {
-  "password": "222222",
+  "password": "22222",
   "host": "39.108.226.222",
   "name": "root",
   "cmd": "ls /home/server;tail -f -n 500 /home/server/admin.log"

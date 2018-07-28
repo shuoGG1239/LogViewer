@@ -1,5 +1,4 @@
 import os
-import re
 import sys
 import threading
 
@@ -8,11 +7,12 @@ from PyQt5.QtGui import QCursor, QTextDocument
 from PyQt5.QtWidgets import QWidget, QMenu, QAction
 from QCandyUi.CandyWindow import colorful
 
-import color_util
+import log4j_type
 import sshLogger
 from SearchForm import SearchForm
 from ui_LogViewer import Ui_LogViewer
 
+# 开启打印
 DEBUG = False
 
 
@@ -79,22 +79,12 @@ class LogViewer(QWidget):
     def __refunc(self, text):
         useful_text = text.strip()
         if useful_text != '':
-            self.ui.textBrowser.append(self.colorize(useful_text))
-
-    def colorize(self, text):
-        """
-        对单行进行着色
-        :param text:
-        :return:
-        """
-        text = re.sub(r'(admin\d?\.log)', color_util.bold(color_util.colorize('\\1', 'orange')), text)
-        text = re.sub(r'\s:\s(.+)', color_util.colorize(' : \\1', 'blue'), text)
-        text = text.replace('INFO', color_util.colorize('INFO', color_util.LIGHT_BLUE))
-        text = text.replace('ERROR', color_util.colorize('ERROR', 'red'))
-        text = text.replace('WARN', color_util.colorize('WARN', 'orange'))
-        text = re.sub(r'(\w+Exception)', color_util.colorize('\\1', 'red'), text)
-        text = re.sub(r'(\([\w_]+\.java:\d+\))', color_util.colorize(color_util.underline('\\1'), 'red'), text)
-        return text
+            ex_list = ('PushUtil', 'pushUtil', 'Jdbc', 'jdbc', 'HostServiceImpl')
+            pretty_text = log4j_type.colorize(useful_text)
+            pretty_text = log4j_type.frame_pack('39.108.226.252', pretty_text)
+            pretty_text = log4j_type.exclude(ex_list, pretty_text)
+            if pretty_text != '':
+                self.ui.textBrowser.append(pretty_text)
 
     def closeEvent(self, e):
         sys.stdout = sys.__stdout__  # 归还print输出
@@ -139,7 +129,7 @@ class LogViewer(QWidget):
 
     def resizeEvent(self, e):
         self.searchForm.setGeometry(e.size().width() - self.searchForm.width(), 0,
-         self.searchForm.width(), self.searchForm.height())
+                                    self.searchForm.width(), self.searchForm.height())
 
 
 # 用于重定向sys.out的类, 只要带write flush方法即可(非重写,是duckType)
