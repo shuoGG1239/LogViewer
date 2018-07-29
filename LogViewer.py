@@ -29,6 +29,7 @@ class LogViewer(QWidget):
         self.__init_menu()
         self.run_log_async()
 
+    # -------search From Start-------
     def __init_searchForm(self):
         self.searchForm = SearchForm()
         self.searchForm.setParent(self)
@@ -57,6 +58,12 @@ class LogViewer(QWidget):
     def __slot_find_backward(self):
         self.ui.textBrowser.find(self.searchForm.ui.lineEdit.text(), QTextDocument.FindBackward)
 
+    def resizeEvent(self, e):
+        self.searchForm.setGeometry(e.size().width() - self.searchForm.width(), 0,
+                                    self.searchForm.width(), self.searchForm.height())
+
+    # --------search From End-------
+
     def run_log_async(self):
         """
         异步跑ssh的logging任务
@@ -72,19 +79,28 @@ class LogViewer(QWidget):
         :return:
         """
         mystream = MyOutStream()
-        mystream.textWritten.connect(self.__refunc)
+        mystream.textWritten.connect(self.__slot_redirect)
         sys.stdout = mystream
 
     @pyqtSlot(str)
-    def __refunc(self, text):
-        useful_text = text.strip()
-        if useful_text != '':
-            ex_list = ('PushUtil', 'pushUtil', 'Jdbc', 'jdbc', 'HostServiceImpl')
-            pretty_text = log4j_type.colorize(useful_text)
-            pretty_text = log4j_type.frame_pack('39.108.226.252', pretty_text)
-            pretty_text = log4j_type.exclude(ex_list, pretty_text)
+    def __slot_redirect(self, text):
+        raw_text = text.strip()
+        if raw_text != '':
+            pretty_text = self.prettify_text(raw_text)
             if pretty_text != '':
                 self.ui.textBrowser.append(pretty_text)
+
+    def prettify_text(self, text):
+        """
+        对日志进行渲染美化, 包括着色过滤等
+        :param text:
+        :return:
+        """
+        ex_list = ('PushUtil', 'pushUtil', 'Jdbc', 'jdbc', 'HostServiceImpl')
+        pretty_text = log4j_type.colorize(text)
+        pretty_text = log4j_type.frame_pack('39.108.226.252', pretty_text)
+        pretty_text = log4j_type.exclude(ex_list, pretty_text)
+        return pretty_text
 
     def closeEvent(self, e):
         sys.stdout = sys.__stdout__  # 归还print输出
@@ -126,10 +142,6 @@ class LogViewer(QWidget):
 
     def contextMenuEvent(self, event):
         self.browserMenu.exec(QCursor.pos())
-
-    def resizeEvent(self, e):
-        self.searchForm.setGeometry(e.size().width() - self.searchForm.width(), 0,
-                                    self.searchForm.width(), self.searchForm.height())
 
 
 # 用于重定向sys.out的类, 只要带write flush方法即可(非重写,是duckType)
